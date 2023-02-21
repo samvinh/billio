@@ -95,7 +95,7 @@ const Calculator = () => {
 
   const [rowData] = useState([])
   const [columnDefs] = useState([
-    {field: 'quantity', flex: 1, editable: true, valueParser: params => Number(params.newValue)},
+    {field: 'quantity', flex: 1, minWidth: 100, editable: true, valueParser: params => Number(params.newValue)},
     {field: 'name', flex: 2, editable: true},
     {field: 'price', flex:2,  editable: true, valueParser: params => Number(params.newValue)}
   ])
