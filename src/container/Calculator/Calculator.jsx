@@ -72,7 +72,7 @@ const Calculator = () => {
     setTotal(roundedTotal)
   }
   }, [taxPercentage, tip])
-  
+
   const gridRef = useRef()
   const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
 
@@ -156,6 +156,7 @@ const Calculator = () => {
               domLayout={'autoHeight'}
               rowSelection={'multiple'}
               animateRows={true}
+              stopEditingWhenCellsLoseFocus={true}
               onCellEditingStopped={() => calculateAll()}
             ></AgGridReact>
           </div>
