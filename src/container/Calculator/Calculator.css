@@ -20,7 +20,9 @@
 .ag-theme-alpine {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   font-size: 14px;
+  --ag-borders: none;
 }
+
 
 .calculator-container {
   margin-left: 10px;

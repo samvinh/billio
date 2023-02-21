@@ -2,6 +2,7 @@ import React, { useState, useRef, useMemo, useCallback, useEffect} from 'react'
 import { AgGridReact } from 'ag-grid-react' // the AG Grid React Component
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 
@@ -14,10 +15,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     neutral: {
-      main: '#A3A095',
+      main: '#555A4D',
     },
     danger: {
-      main: '#EE4B2B',
+      main: '#2E3D34',
     },
   },
 });
@@ -111,9 +112,13 @@ const Calculator = () => {
 
   const addItem = useCallback((addIndex) => {
     gridRef.current.api.applyTransaction({
-      add: [{quantity: 1,}],
+      add: [{quantity: 1, price: 0}],
       addIndex: addIndex,
     })
+  }, [])
+
+  const deselect = useCallback(() => {
+    gridRef.current.api.deselectAll();
   }, [])
 
   const onRemoveSelected = useCallback(() => {
@@ -141,8 +146,8 @@ const Calculator = () => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', marginBottom: '20px', marginTop: '20px', justifyContent: 'space-between' }}>
         <ThemeProvider theme={theme}>
-          <Button variant='contained' color='danger' onClick={onRemoveSelected}>Remove Selected</Button>
-          <Button variant='contained' color='danger' onClick={clearData}>Clear Data</Button>
+          <Button variant='outlined' color='danger' onClick={onRemoveSelected}>Remove Selected</Button>
+          <Button variant='outlined' color='danger' onClick={clearData}>Clear Data</Button>
         </ThemeProvider>
         </div>
         <div style={{ flexGrow: '1' }}>
@@ -164,21 +169,23 @@ const Calculator = () => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '10px'}}>
         <ThemeProvider theme={theme}>
-          <Button variant='contained' color='neutral' onClick={() => addItem(undefined)}>Add Item</Button>
+          <Button variant='standard' color='neutral' onClick={() => deselect()}>Unselect All</Button>
+          <Button variant='standard' color='neutral' startIcon={<AddCircleIcon />} onClick={() => addItem(undefined)}>Add Item</Button>
           {/* <Button variant='contained' color='neutral' onClick={() => getRowData()}>Data</Button> */}
         </ThemeProvider>
       </div>
-      <div style={{display: 'flex', flexDirection:'column', marginLeft: '20px', marginRight: '20px', minWidth: '40px', maxWidth: '120px'}}>
+      <div style={{display: 'flex', flexDirection:'column', marginLeft: '20px', marginRight: '20px', minWidth: '40px', maxWidth: '140px'}}>
         <TextField
           id="tax-percentage"
           type="number"
           variant="standard"
-          label="Tax Percent"
+          label="Tax percent"
           InputProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
           }}
           inputProps={{
-            min: 0, step: '.1'
+            min: 0, 
+            step: '.1'
           }}
           onChange={handleTaxPercentageChange}
         />
@@ -198,9 +205,9 @@ const Calculator = () => {
         />
       </div>
       <div className='calculator-cost-breakdown'>
-        <Typography variant='body1'>Subtotal: ${subtotal}</Typography>
-        <Typography variant='body1'>Tax: ${tax}</Typography>
-        <Typography variant='h6'>Total: ${total}</Typography>
+        <Typography variant='body1'>Subtotal: ${subtotal.toFixed(2)}</Typography>
+        <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
+        <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
       </div>
     </div>
   )

@@ -5,17 +5,9 @@ import { Calculator } from './container';
 
 
 function App() {
-  const darkTheme = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  });
   return (
-    <div>
-      {/* <ThemeProvider theme={darkTheme}> */}
-        {/* <CssBaseline /> */}
+    <div className='app'>
         <Calculator />
-      {/* </ThemeProvider> */}
     </div>
   );
 }
