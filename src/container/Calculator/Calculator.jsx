@@ -43,6 +43,9 @@ const printResult = (res) => {
 }
 
 const Calculator = () => {
+  const [discountPercentage, setDiscountPercentage] = useState(0)
+  const [discount, setDiscount] = useState(0)
+
   const [taxPercentage, setTaxPercentage] = useState(0);
   const [tax, setTax] = useState(0)
 
@@ -131,6 +134,10 @@ const Calculator = () => {
     setTaxPercentage(event.target.value);
   }
 
+  const handleDiscountPercentageChange = (event) => {
+    setDiscountPercentage(event.target.value);
+  }
+
   const handleTipChange = (event) => {
     setTip(event.target.value);
   }
@@ -188,6 +195,20 @@ const Calculator = () => {
             step: '.1'
           }}
           onChange={handleTaxPercentageChange}
+        />
+        <TextField
+          id="discount-percentage"
+          type="number"
+          variant="standard"
+          label="Discount percent"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+          }}
+          inputProps={{
+            min: 0, 
+            step: '.1'
+          }}
+          onChange={handleDiscountPercentageChange}
         />
         <TextField
           id="tip"
