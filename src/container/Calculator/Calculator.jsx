@@ -44,7 +44,7 @@ const printResult = (res) => {
 
 const Calculator = () => {
   const [discountPercentage, setDiscountPercentage] = useState(0)
-  const [discount, setDiscount] = useState(0)
+  const [discount, setDiscount] = useState(null)
 
   const [taxPercentage, setTaxPercentage] = useState(0);
   const [tax, setTax] = useState(0)
@@ -68,14 +68,27 @@ const Calculator = () => {
     }, 0)
     let roundedSubtotal = Math.round(rawSubtotal * 100) / 100
     setSubtotal(roundedSubtotal)
-    let rawTax = rawSubtotal * (taxPercentage / 100)
-    let roundedTax = Math.round(rawTax * 100) / 100
-    setTax(roundedTax);
-    let rawTotal = rawSubtotal +  rawTax  + Number(tip);
-    let roundedTotal = Math.round(rawTotal * 100) / 100
-    setTotal(roundedTotal)
+    if(discountPercentage > 0) {
+      let rawDiscount = rawSubtotal * (discountPercentage / 100)
+      let roundedDiscount = Math.round(rawDiscount * 100) / 100
+      setDiscount(roundedDiscount)
+      let rawTax = (rawSubtotal - rawDiscount) * (taxPercentage / 100)
+      let roundedTax = Math.round(rawTax * 100) / 100
+      setTax(roundedTax);
+      let rawTotal = (rawSubtotal - rawDiscount) +  rawTax  + Number(tip);
+      let roundedTotal = Math.round(rawTotal * 100) / 100
+      setTotal(roundedTotal)
+    } else {
+      setDiscount(null)
+      let rawTax = rawSubtotal * (taxPercentage / 100)
+      let roundedTax = Math.round(rawTax * 100) / 100
+      setTax(roundedTax);
+      let rawTotal = rawSubtotal +  rawTax  + Number(tip);
+      let roundedTotal = Math.round(rawTotal * 100) / 100
+      setTotal(roundedTotal)
+    }
   }
-  }, [taxPercentage, tip])
+  }, [taxPercentage, discountPercentage, tip])
 
   const gridRef = useRef()
   const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
@@ -146,7 +159,7 @@ const Calculator = () => {
 
   useEffect(() => {
     calculateAll()
-  }, [taxPercentage, tip, calculateAll])
+  }, [taxPercentage, discountPercentage, tip, calculateAll])
 
   return (
     <div className='calculator-container'>
@@ -183,20 +196,6 @@ const Calculator = () => {
       </div>
       <div style={{display: 'flex', flexDirection:'column', marginLeft: '20px', marginRight: '20px', minWidth: '40px', maxWidth: '140px'}}>
         <TextField
-          id="tax-percentage"
-          type="number"
-          variant="standard"
-          label="Tax percent"
-          InputProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-          }}
-          inputProps={{
-            min: 0, 
-            step: '.1'
-          }}
-          onChange={handleTaxPercentageChange}
-        />
-        <TextField
           id="discount-percentage"
           type="number"
           variant="standard"
@@ -209,6 +208,20 @@ const Calculator = () => {
             step: '.1'
           }}
           onChange={handleDiscountPercentageChange}
+        />
+        <TextField
+          id="tax-percentage"
+          type="number"
+          variant="standard"
+          label="Tax percent"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+          }}
+          inputProps={{
+            min: 0, 
+            step: '.1'
+          }}
+          onChange={handleTaxPercentageChange}
         />
         <TextField
           id="tip"
@@ -227,6 +240,7 @@ const Calculator = () => {
       </div>
       <div className='calculator-cost-breakdown'>
         <Typography variant='body1'>Subtotal: ${subtotal.toFixed(2)}</Typography>
+        {discount && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
         <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
         <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
       </div>
