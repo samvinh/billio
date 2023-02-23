@@ -158,7 +158,9 @@ const Calculator = () => {
     setTip(event.target.value);
   }
 
-
+  const handleBillNameChange = (event) => {
+    setTip(event.target.value);
+  }
 
   useEffect(() => {
     calculateAll()
@@ -167,6 +169,14 @@ const Calculator = () => {
   return (
     <div className='calculator-container'>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {/* <div style={{ paddingLeft: '2em', paddingRight: '2em' }}> */}
+          <TextField
+            id="billName"
+            variant="standard"
+            label="Bill Name"
+            onChange={handleBillNameChange}
+          />
+        {/* </div> */}
         <div style={{ display: 'flex', marginBottom: '20px', marginTop: '20px', justifyContent: 'space-between' }}>
         <ThemeProvider theme={theme}>
           <Button variant='outlined' color='primary' onClick={clearData}>Clear Data</Button>
