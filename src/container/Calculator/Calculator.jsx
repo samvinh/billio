@@ -46,6 +46,7 @@ const printResult = (res) => {
 }
 
 const Calculator = () => {
+  const [billName, setBillName] = useState('')
   const [discountPercentage, setDiscountPercentage] = useState(0)
   const [discount, setDiscount] = useState(null)
 
@@ -56,13 +57,28 @@ const Calculator = () => {
 
   const [subtotal, setSubtotal] = useState(0)
   const [total, setTotal] = useState(0)
+  const [rowData, setRowData] = useState([])
+  const [columnDefs] = useState([
+    {field: 'quantity', flex: 1, minWidth: 100, editable: true, valueParser: params => Number(params.newValue)},
+    {field: 'name', flex: 2, editable: true},
+    {field: 'price', flex:2,  editable: true, valueParser: params => Number(params.newValue)}
+  ])
+  const defaultColDef = useMemo(() => {
+    return {
+      resizable: true,
+    }
+  }, [])
 
   const calculateAll = useCallback(() => {
     const rowData = []
     if(gridRef.current.api){
-    gridRef.current.api.forEachNode(function (node) {
-      rowData.push(node.data)
-    })
+      gridRef.current.api.forEachNode(function (node) {
+        rowData.push(node.data)
+      }
+    )    
+    setRowData(rowData)
+    window.localStorage.setItem('rowData', JSON.stringify(rowData))
+
     let rawSubtotal = rowData.reduce((sum, cur) => {
       if(cur.quantity && cur.price)
         return sum + Number((cur.quantity * cur.price))
@@ -93,20 +109,33 @@ const Calculator = () => {
   }
   }, [taxPercentage, discountPercentage, tip])
 
+
+  //Persisting data between refresh
+  useEffect(() => {
+    setBillName(window.localStorage.getItem('billName'))
+    const rowDataFromStorage = window.localStorage.getItem('rowData')
+    const initialRowData = rowDataFromStorage.length > 0
+      ? JSON.parse(rowDataFromStorage) : []
+    setRowData(initialRowData)
+    setDiscountPercentage(window.localStorage.getItem('discountPercentage'))
+    setTaxPercentage(window.localStorage.getItem('taxPercentage'))
+    setTip(window.localStorage.getItem('tip'))
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('billName', billName)
+    window.localStorage.setItem('rowData', JSON.stringify(rowData))
+  }, [billName, rowData]);
+
+  useEffect(() => {
+    window.localStorage.setItem('discountPercentage', discountPercentage);
+    window.localStorage.setItem('taxPercentage', taxPercentage);
+    window.localStorage.setItem('tip', tip);
+    calculateAll()
+  }, [taxPercentage, discountPercentage, tip, calculateAll])
+
   const gridRef = useRef()
   const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
-
-  const [rowData] = useState([])
-  const [columnDefs] = useState([
-    {field: 'quantity', flex: 1, minWidth: 100, editable: true, valueParser: params => Number(params.newValue)},
-    {field: 'name', flex: 2, editable: true},
-    {field: 'price', flex:2,  editable: true, valueParser: params => Number(params.newValue)}
-  ])
-  const defaultColDef = useMemo(() => {
-    return {
-      resizable: true,
-    }
-  }, [])
 
   const getRowData = useCallback(() => {
     console.log("Calling get row data")
@@ -127,6 +156,13 @@ const Calculator = () => {
       remove: rowData,
     })
     calculateAll()
+    localStorage.clear();
+    setBillName('')
+    setDiscount(0)
+    setDiscountPercentage(0)
+    setTax(0)
+    setTaxPercentage(0)
+    setTip(0)
   }, [calculateAll])
 
   const addItem = useCallback((addIndex) => {
@@ -159,24 +195,20 @@ const Calculator = () => {
   }
 
   const handleBillNameChange = (event) => {
-    setTip(event.target.value);
+    setBillName(event.target.value);
   }
 
-  useEffect(() => {
-    calculateAll()
-  }, [taxPercentage, discountPercentage, tip, calculateAll])
 
   return (
     <div className='calculator-container'>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* <div style={{ paddingLeft: '2em', paddingRight: '2em' }}> */}
           <TextField
             id="billName"
+            value={billName}
             variant="standard"
             label="Bill Name"
             onChange={handleBillNameChange}
           />
-        {/* </div> */}
         <div style={{ display: 'flex', marginBottom: '20px', marginTop: '20px', justifyContent: 'space-between' }}>
         <ThemeProvider theme={theme}>
           <Button variant='outlined' color='primary' onClick={clearData}>Clear Data</Button>
@@ -210,6 +242,7 @@ const Calculator = () => {
       <div style={{display: 'flex', flexDirection:'column', marginLeft: '20px', marginRight: '20px', minWidth: '40px', maxWidth: '140px'}}>
         <TextField
           id="discount-percentage"
+          value={discountPercentage}
           type="number"
           variant="standard"
           label="Discount percent"
@@ -224,6 +257,7 @@ const Calculator = () => {
         />
         <TextField
           id="tax-percentage"
+          value={taxPercentage}
           type="number"
           variant="standard"
           label="Tax percent"
@@ -238,6 +272,7 @@ const Calculator = () => {
         />
         <TextField
           id="tip"
+          value={tip}
           type="number"
           variant="standard"
           label="Tip"
