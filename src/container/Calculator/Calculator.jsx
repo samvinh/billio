@@ -17,6 +17,9 @@ const theme = createTheme({
     neutral: {
       main: '#555A4D',
     },
+    primary: {
+      main: '#2ED2BD'
+    },
     danger: {
       main: '#2E3D34',
     },
@@ -166,8 +169,8 @@ const Calculator = () => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', marginBottom: '20px', marginTop: '20px', justifyContent: 'space-between' }}>
         <ThemeProvider theme={theme}>
+          <Button variant='outlined' color='primary' onClick={clearData}>Clear Data</Button>
           <Button variant='outlined' color='danger' onClick={onRemoveSelected}>Remove Selected</Button>
-          <Button variant='outlined' color='danger' onClick={clearData}>Clear Data</Button>
         </ThemeProvider>
         </div>
         <div style={{ flexGrow: '1' }}>
@@ -189,8 +192,8 @@ const Calculator = () => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '10px'}}>
         <ThemeProvider theme={theme}>
-          <Button variant='standard' color='neutral' onClick={() => deselect()}>Unselect All</Button>
-          <Button variant='standard' color='neutral' startIcon={<AddCircleIcon />} onClick={() => addItem(undefined)}>Add Item</Button>
+          <Button sx={{ ml: '2em', mr:'2em', mt: '1em'}} variant='standard' color='neutral' onClick={() => deselect()}>Unselect All</Button>
+          <Button sx={{ ml: '2em', mr:'2em', mt: '1em'}} variant='contained' color='primary' startIcon={<AddCircleIcon />} onClick={() => addItem(undefined)}>Add Item</Button>
           {/* <Button variant='contained' color='neutral' onClick={() => getRowData()}>Data</Button> */}
         </ThemeProvider>
       </div>

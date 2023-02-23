@@ -8,14 +8,14 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "apple-touch-icon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "billio-logo-symbol.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "290x290"
     }
   ],
   "start_url": ".",

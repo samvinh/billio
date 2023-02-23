@@ -35,6 +35,8 @@
   align-items: flex-end;
   margin-top: 10px;
   margin-right: 10px;
+  margin-bottom: 2vh;
+  padding-bottom: 4em;
 }
 
 @media screen and (min-width: 600px) {
