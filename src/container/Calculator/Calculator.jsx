@@ -112,14 +112,17 @@ const Calculator = () => {
 
   //Persisting data between refresh
   useEffect(() => {
-    setBillName(window.localStorage.getItem('billName'))
-    const rowDataFromStorage = window.localStorage.getItem('rowData')
-    const initialRowData = rowDataFromStorage.length > 0
-      ? JSON.parse(rowDataFromStorage) : []
-    setRowData(initialRowData)
-    setDiscountPercentage(window.localStorage.getItem('discountPercentage'))
-    setTaxPercentage(window.localStorage.getItem('taxPercentage'))
-    setTip(window.localStorage.getItem('tip'))
+    const billName = window.localStorage.getItem('billName') != null ? window.localStorage.getItem('billName') : ''
+    const rowData = window.localStorage.getItem('rowData') != null ? JSON.parse(window.localStorage.getItem('rowData')) : []
+    const discountPercentage = window.localStorage.getItem('discountPercentage') != null ? window.localStorage.getItem('discountPercentage') : 0
+    const taxPercentage = window.localStorage.getItem('taxPercentage') != null ? window.localStorage.getItem('taxPercentage') : 0
+    const tip = window.localStorage.getItem('tip') != null ? window.localStorage.getItem('tip') : 0
+    
+    setBillName(billName)
+    setRowData(rowData)
+    setDiscountPercentage(discountPercentage)
+    setTaxPercentage(taxPercentage)
+    setTip(tip)
   }, []);
 
   useEffect(() => {
