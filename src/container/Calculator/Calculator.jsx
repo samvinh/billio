@@ -67,9 +67,9 @@ const Calculator = () => {
 
   const [rowData, setRowData] = useState([])
   const [columnDefs] = useState([
-    {field: 'quantity', flex: 1, minWidth: 100, editable: true, valueParser: params => Number(params.newValue)},
-    {field: 'name', flex: 2, editable: true},
-    {field: 'price', flex:2,  editable: true, valueParser: params => Number(params.newValue)}
+    {field: 'qty', flex: 1, editable: true, valueParser: params => Number(params.newValue)},
+    {field: 'name', flex: 3, editable: true, wrapText: true, autoHeight: true, resizable: true},
+    {field: 'price', flex: 1,  editable: true, valueParser: params => Number(params.newValue)}
   ])
   const defaultColDef = useMemo(() => {
     return {
