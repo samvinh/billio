@@ -1,11 +1,16 @@
 # Getting Started with Billio
 
-Hi, this project is currently deployed and available to use at https://bill.samvinh.com
+Hi there, 
 
-I often want to estimate bills at restaurant while I am selecting menu items to make sure
-I am staying within an acceptable budget range. This estimation, of course, does not only
-apply to restaurants but just about any time you need to calculate any bill including discounts,
-tax, and tip. You can also split the total any number of ways >= 1. 
+To use this tool, you can visit: https://billio.samvinh.com
+
+This project came about when I wanted to do less mental math when dining out. I often estimate the bill while I am selecting menu items to make sure I am staying within an acceptable budget range.
+
+Bill estimations, of course, do not only apply to restaurants but any time you need to calculate a purchase including discounts, tax, and tip. 
+
+Discounts apply before tax and tip.
+
+You can also split the total for group purchases. 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
