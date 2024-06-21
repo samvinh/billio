@@ -28,25 +28,6 @@ const theme = createTheme({
   },
 });
 
-const printResult = (res) => {
-  console.log('---------------------------------------')
-  if (res.add) {
-    res.add.forEach(function (rowNode) {
-      console.log('Added Row Node', rowNode)
-    })
-  }
-  if (res.remove) {
-    res.remove.forEach(function (rowNode) {
-      console.log('Removed Row Node', rowNode)
-    })
-  }
-  if (res.update) {
-    res.update.forEach(function (rowNode) {
-      console.log('Updated Row Node', rowNode)
-    })
-  }
-}
-
 const Calculator = () => {
   const [billName, setBillName] = useState('')
 
@@ -88,8 +69,9 @@ const Calculator = () => {
     window.localStorage.setItem('rowData', JSON.stringify(rowData))
 
     let rawSubtotal = rowData.reduce((sum, cur) => {
-      if(cur.quantity && cur.price)
-        return sum + Number((cur.quantity * cur.price))
+      if(cur.qty && cur.price){
+        return sum + Number((cur.qty * cur.price))
+      }
       else 
         return sum
     }, 0)
@@ -162,16 +144,6 @@ const Calculator = () => {
   const gridRef = useRef()
   const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
 
-  const getRowData = useCallback(() => {
-    console.log("Calling get row data")
-    const rowData = []
-    gridRef.current.api.forEachNode(function (node) {
-      rowData.push(node.data)
-    })
-    console.log('Row Data:')
-    console.table(rowData)
-  }, [])
-
   const clearData = useCallback(() => {
     const rowData = []
     gridRef.current.api.forEachNode(function (node) {
@@ -194,7 +166,7 @@ const Calculator = () => {
 
   const addItem = useCallback((addIndex) => {
     gridRef.current.api.applyTransaction({
-      add: [{quantity: 1, price: 0}],
+      add: [{qty: 1, price: 0}],
       addIndex: addIndex,
     })
   }, [])
