@@ -12,21 +12,8 @@ import 'ag-grid-community/styles/ag-grid.css' // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-alpine.css' // Optional theme CSS
 import './Calculator.css'
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const theme = createTheme({
-  palette: {
-    neutral: {
-      main: '#555A4D',
-    },
-    primary: {
-      main: '#2ED2BD'
-    },
-    danger: {
-      main: '#2E3D34',
-    },
-  },
-});
+import { ThemeProvider } from '@mui/material/styles';
+import theme from '../../themes/themes';
 
 const Calculator = () => {
   const [billName, setBillName] = useState('')
@@ -211,8 +198,8 @@ const Calculator = () => {
 
   return (
     <ThemeProvider theme={theme}>
-    <div className='calculator-container'>
-      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div className='calculator-container'>
+        <div className='full-height'>
           <TextField
             id="billName"
             value={billName}
@@ -220,101 +207,101 @@ const Calculator = () => {
             label="Bill Name"
             onChange={handleBillNameChange}
           />
-        <div style={{ display: 'flex', marginBottom: '20px', marginTop: '20px', justifyContent: 'space-between' }}>
-          <Button variant='outlined' color='primary' onClick={clearData}>Clear Data</Button>
-          <Button variant='outlined' color='danger' onClick={onRemoveSelected}>Remove Selected</Button>
-        </div>
-        <div style={{ flexGrow: '1' }}>
-          <div style={gridStyle} className="ag-theme-alpine">
-            <AgGridReact
-              ref={gridRef}
-              rowData={rowData}
-              columnDefs={columnDefs}
-              singleClickEdit={true}
-              defaultColDef={defaultColDef}
-              domLayout={'autoHeight'}
-              rowSelection={'multiple'}
-              animateRows={true}
-              stopEditingWhenCellsLoseFocus={true}
-              onCellEditingStopped={() => calculateAll()}
-            ></AgGridReact>
+          <div className='button-group'>
+            <Button variant='outlined' color='primary' onClick={clearData}>Clear Data</Button>
+            <Button variant='outlined' color='danger' onClick={onRemoveSelected}>Remove Selected</Button>
+          </div>
+          <div className='flex-grow'>
+            <div style={gridStyle} className="ag-theme-alpine">
+              <AgGridReact
+                ref={gridRef}
+                rowData={rowData}
+                columnDefs={columnDefs}
+                singleClickEdit={true}
+                defaultColDef={defaultColDef}
+                domLayout={'autoHeight'}
+                rowSelection={'multiple'}
+                animateRows={true}
+                stopEditingWhenCellsLoseFocus={true}
+                onCellEditingStopped={() => calculateAll()}
+              ></AgGridReact>
+            </div>
           </div>
         </div>
+        <div className='center-content'>
+          <Button sx={{ ml: '2em', mr: '2em', mt: '1em'}} variant='standard' color='neutral' onClick={() => deselect()}>Unselect All</Button>
+          <Button sx={{ ml: '2em', mr: '2em', mt: '1em'}} variant='contained' color='primary' startIcon={<AddCircleIcon />} onClick={() => addItem(undefined)}>Add Item</Button>
+          {/* <Button variant='contained' color='neutral' onClick={() => getRowData()}>Data</Button> */}
+        </div>
+        <div className='options-container'>
+          <FormControlLabel color='primary' control={<Switch value={options} onChange={handleOptionsChange}/>} label="Options" />
+          {options && <div>
+            <TextField
+              id="discount-percentage"
+              value={discountPercentage}
+              type="number"
+              variant="standard"
+              label="Discount percent"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{
+                min: 0, 
+                step: '.1'
+              }}
+              onChange={handleDiscountPercentageChange}
+            />
+            <TextField
+              id="tax-percentage"
+              value={taxPercentage}
+              type="number"
+              variant="standard"
+              label="Tax percent"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{
+                min: 0, 
+                step: '.1'
+              }}
+              onChange={handleTaxPercentageChange}
+            />
+            <TextField
+              id="tip"
+              value={tip}
+              type="number"
+              variant="standard"
+              label="Tip"
+              InputProps={{
+                startAdornment: <InputAdornment position="start">$</InputAdornment>,
+              }}
+              inputProps={{
+                min: 0, 
+                step: '.01'
+              }}
+              onChange={handleTipChange}
+            />
+            <TextField
+              id="splitDivisor"
+              value={splitDivisor}
+              type="number"
+              variant="standard"
+              label={splitDivisorText}
+              inputProps={{
+                min: 1, 
+              }}
+              onChange={handleSplitDivisorChange}
+            />
+          </div>}
+        </div>
+        <div className='cost-breakdown'>
+          <Typography variant='body1'>Subtotal: ${subtotal.toFixed(2)}</Typography>
+          {discount && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
+          <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
+          <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
+          {splitAmount > 0 && splitDivisor.length > 0 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px'}}>
-        <Button sx={{ ml: '2em', mr:'2em', mt: '1em'}} variant='standard' color='neutral' onClick={() => deselect()}>Unselect All</Button>
-        <Button sx={{ ml: '2em', mr:'2em', mt: '1em'}} variant='contained' color='primary' startIcon={<AddCircleIcon />} onClick={() => addItem(undefined)}>Add Item</Button>
-        {/* <Button variant='contained' color='neutral' onClick={() => getRowData()}>Data</Button> */}
-      </div>
-      <div style={{display: 'flex', flexDirection:'column', marginLeft: '20px', marginRight: '20px', minWidth: '40px', maxWidth: '140px'}}>
-        <FormControlLabel color='primary' control={<Switch value={options} onChange={handleOptionsChange}/>} label="Options" />
-        {options && <div>
-          <TextField
-            id="discount-percentage"
-            value={discountPercentage}
-            type="number"
-            variant="standard"
-            label="Discount percent"
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-            inputProps={{
-              min: 0, 
-              step: '.1'
-            }}
-            onChange={handleDiscountPercentageChange}
-          />
-          <TextField
-            id="tax-percentage"
-            value={taxPercentage}
-            type="number"
-            variant="standard"
-            label="Tax percent"
-            InputProps={{
-              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-            }}
-            inputProps={{
-              min: 0, 
-              step: '.1'
-            }}
-            onChange={handleTaxPercentageChange}
-          />
-          <TextField
-            id="tip"
-            value={tip}
-            type="number"
-            variant="standard"
-            label="Tip"
-            InputProps={{
-              startAdornment: <InputAdornment position="start">$</InputAdornment>,
-            }}
-            inputProps={{
-              min: 0, 
-              step: '.01'
-            }}
-            onChange={handleTipChange}
-          />
-          <TextField
-            id="splitDivisor"
-            value={splitDivisor}
-            type="number"
-            variant="standard"
-            label={splitDivisorText}
-            inputProps={{
-              min: 1, 
-            }}
-            onChange={handleSplitDivisorChange}
-          />
-        </div>}
-      </div>
-      <div className='calculator-cost-breakdown'>
-        <Typography variant='body1'>Subtotal: ${subtotal.toFixed(2)}</Typography>
-        {discount && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
-        <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
-        <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
-        {splitAmount > 0 && splitDivisor.length > 0 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
-      </div>
-    </div>
     </ThemeProvider>
   )
 }

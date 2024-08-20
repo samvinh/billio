@@ -64,3 +64,45 @@
     width: 800px;
   }
 }
+
+.full-height {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-group {
+  display: flex;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  justify-content: space-between;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.center-content {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 40px;
+  max-width: 140px;
+}
+
+.cost-breakdown {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-bottom: 2vh;
+  padding-bottom: 4em;
+}
