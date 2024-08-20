@@ -1,6 +1,7 @@
 import billio from '../assets/billio-logo.png';
 
-
-export default {
+const assets = {
   billio,
-}
+};
+
+export default assets;
