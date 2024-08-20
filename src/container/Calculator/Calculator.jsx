@@ -14,6 +14,7 @@ import './Calculator.css'
 
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../../themes/themes';
+import { columnDefs } from '../../config/columnDefs';
 
 const Calculator = () => {
   const [billName, setBillName] = useState('')
@@ -34,11 +35,7 @@ const Calculator = () => {
   const [total, setTotal] = useState(0)
 
   const [rowData, setRowData] = useState([])
-  const [columnDefs] = useState([
-    {field: 'qty', flex: 1, editable: true, valueParser: params => Number(params.newValue)},
-    {field: 'name', flex: 3, editable: true, wrapText: true, autoHeight: true, resizable: true},
-    {field: 'price', flex: 1,  editable: true, valueParser: params => Number(params.newValue)}
-  ])
+
   const defaultColDef = useMemo(() => {
     return {
       resizable: true,
