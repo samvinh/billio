@@ -16,6 +16,16 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from '../../themes/themes';
 import { columnDefs } from '../../config/columnDefs';
 
+import {
+  handleInputChange,
+  handleNumericChange,
+  handleSwitchChange,
+  handleAddItem,
+  handleClearData,
+  handleDeselectAll,
+  handleRemoveSelected,
+} from '../../handlers/handlers';
+
 const Calculator = () => {
   const [billName, setBillName] = useState('')
 
@@ -36,11 +46,10 @@ const Calculator = () => {
 
   const [rowData, setRowData] = useState([])
 
-  const defaultColDef = useMemo(() => {
-    return {
-      resizable: true,
-    }
-  }, [])
+  const defaultColDef = useMemo(() => ({ resizable: true }), []);
+
+  const gridRef = useRef()
+  const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
 
   const calculateAll = useCallback(() => {
     const rowData = []
@@ -125,71 +134,26 @@ const Calculator = () => {
     calculateAll()
   }, [taxPercentage, discountPercentage, tip, splitDivisor, calculateAll])
 
-  const gridRef = useRef()
-  const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
+  const handleBillNameChange = handleInputChange(setBillName);
+  const handleOptionsChange = handleSwitchChange(setOptions);
+  const handleTaxPercentageChange = handleNumericChange(setTaxPercentage);
+  const handleDiscountPercentageChange = handleNumericChange(setDiscountPercentage);
+  const handleTipChange = handleNumericChange(setTip);
+  const handleSplitDivisorChange = handleNumericChange(setSplitDivisor, 1);
 
-  const clearData = useCallback(() => {
-    const rowData = []
-    gridRef.current.api.forEachNode(function (node) {
-      rowData.push(node.data)
-    })
-    gridRef.current.api.applyTransaction({
-      remove: rowData,
-    })
-    calculateAll()
-    localStorage.clear();
-    setBillName('')
-    setDiscount(null)
-    setDiscountPercentage(0)
-    setTax(0)
-    setTaxPercentage(0)
-    setTip(0)
-    setSplitDivisor(1)
-    setSplitAmount(null)
-  }, [calculateAll])
-
-  const addItem = useCallback((addIndex) => {
-    gridRef.current.api.applyTransaction({
-      add: [{qty: 1, price: 0}],
-      addIndex: addIndex,
-    })
-  }, [])
-
-  const deselect = useCallback(() => {
-    gridRef.current.api.deselectAll();
-  }, [])
-
-  const onRemoveSelected = useCallback(() => {
-    const selectedData = gridRef.current.api.getSelectedRows()
-    gridRef.current.api.applyTransaction({ remove: selectedData })
-    calculateAll()
-  }, [calculateAll])
-
-  const handleBillNameChange = (event) => {
-    setBillName(event.target.value)
-  }
-
-  const handleOptionsChange = (event) => {
-    setOptions(event.target.checked)
-  }
-
-  const handleTaxPercentageChange = (event) => {
-    setTaxPercentage(event.target.value)
-  }
-
-  const handleDiscountPercentageChange = (event) => {
-    setDiscountPercentage(event.target.value)
-  }
-
-  const handleTipChange = (event) => {
-    if(event.target.value < 0) setTip(0)
-    else setTip(event.target.value)
-  }
-
-  const handleSplitDivisorChange = (event) => {
-    if(event.target.value < 1 && event.target.value.length >= 1) setSplitDivisor(1)
-    else setSplitDivisor(event.target.value)
-  }
+  const addItem = handleAddItem(gridRef);
+  const clearData = handleClearData(gridRef, calculateAll, (newState) => {
+    setBillName(newState.billName);
+    setDiscount(newState.discount);
+    setDiscountPercentage(newState.discountPercentage);
+    setTax(newState.tax);
+    setTaxPercentage(newState.taxPercentage);
+    setTip(newState.tip);
+    setSplitDivisor(newState.splitDivisor);
+    setSplitAmount(newState.splitAmount);
+  });
+  const deselect = handleDeselectAll(gridRef);
+  const onRemoveSelected = handleRemoveSelected(gridRef, calculateAll);
 
   let splitDivisorText = splitDivisor > 1 ? `Split ${splitDivisor}-ways` : `Split ${splitDivisor}-way`
 
