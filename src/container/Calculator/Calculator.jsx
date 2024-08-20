@@ -243,7 +243,7 @@ const Calculator = () => {
               onChange={handleTipChange}
             />
             <TextField
-              id="splitDivisor"
+              id="split-divisor"
               value={splitDivisor}
               type="number"
               variant="standard"
