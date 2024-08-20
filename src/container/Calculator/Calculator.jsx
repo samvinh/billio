@@ -14,8 +14,7 @@ import './Calculator.css'
 
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../../themes/themes';
-import { columnDefs } from '../../config/columnDefs';
-
+import { defaultColDef, gridStyle, columnDefs } from '../../config/gridConfig';
 import {
   handleInputChange,
   handleNumericChange,
@@ -31,10 +30,10 @@ const Calculator = () => {
 
   const [options, setOptions] = useState(false)
   const [splitDivisor, setSplitDivisor] = useState(1)
-  const [splitAmount, setSplitAmount] = useState(null)
+  const [splitAmount, setSplitAmount] = useState(0)
 
   const [discountPercentage, setDiscountPercentage] = useState(0)
-  const [discount, setDiscount] = useState(null)
+  const [discount, setDiscount] = useState(0)
 
   const [taxPercentage, setTaxPercentage] = useState(0);
   const [tax, setTax] = useState(0)
@@ -46,62 +45,52 @@ const Calculator = () => {
 
   const [rowData, setRowData] = useState([])
 
-  const defaultColDef = useMemo(() => ({ resizable: true }), []);
-
   const gridRef = useRef()
-  const gridStyle = useMemo(() => ({ height: '100%', width: '100%', }), [])
 
   const calculateAll = useCallback(() => {
-    const rowData = []
-    if(gridRef.current.api){
-      gridRef.current.api.forEachNode(function (node) {
-        rowData.push(node.data)
-      }
-    )    
-    setRowData(rowData)
-    window.localStorage.setItem('rowData', JSON.stringify(rowData))
-
-    let rawSubtotal = rowData.reduce((sum, cur) => {
-      if(cur.qty && cur.price){
-        return sum + Number((cur.qty * cur.price))
-      }
-      else 
-        return sum
-    }, 0)
-    let roundedSubtotal = Math.round(rawSubtotal * 100) / 100
-    setSubtotal(roundedSubtotal)
-    if(discountPercentage > 0) {
-      let rawDiscount = rawSubtotal * (discountPercentage / 100)
-      let roundedDiscount = Math.round(rawDiscount * 100) / 100
-      setDiscount(roundedDiscount)
-      let rawTax = (rawSubtotal - rawDiscount) * (taxPercentage / 100)
-      let roundedTax = Math.round(rawTax * 100) / 100
-      setTax(roundedTax);
-      let rawTotal = (rawSubtotal - rawDiscount) +  rawTax  + Number(tip)
-      let roundedTotal = Math.round(rawTotal * 100) / 100
-      setTotal(roundedTotal)
-      if(splitDivisor > 0){
-        let rawSplitAmount = rawTotal / splitDivisor
-        let roundedSplitAmount = Math.round(rawSplitAmount * 100) / 100
-        setSplitAmount(roundedSplitAmount)
-      }
-    } else {
-      setDiscount(null)
-      let rawTax = rawSubtotal * (taxPercentage / 100)
-      let roundedTax = Math.round(rawTax * 100) / 100
-      setTax(roundedTax);
-      let rawTotal = rawSubtotal +  rawTax  + Number(tip)
-      let roundedTotal = Math.round(rawTotal * 100) / 100
-      setTotal(roundedTotal)
-      if(splitDivisor > 0){
-        let rawSplitAmount = rawTotal / splitDivisor
-        let roundedSplitAmount = Math.round(rawSplitAmount * 100) / 100
-        setSplitAmount(roundedSplitAmount)
-      }
+    const rowData = [];
+  
+    if (gridRef.current?.api) {
+      gridRef.current.api.forEachNode(node => rowData.push(node.data));
     }
-  }
-  }, [taxPercentage, discountPercentage, tip, splitDivisor])
-
+  
+    setRowData(rowData);
+    window.localStorage.setItem('rowData', JSON.stringify(rowData));
+  
+    const rawSubtotal = rowData.reduce(
+      (sum, { qty, price }) => (qty && price ? sum + qty * price : sum),
+      0
+    );
+    const roundedSubtotal = Math.round(rawSubtotal * 100) / 100;
+    setSubtotal(roundedSubtotal);
+  
+    let rawDiscount = 0;
+    let roundedDiscount = 0;
+  
+    if (discountPercentage > 0) {
+      rawDiscount = rawSubtotal * (discountPercentage / 100);
+      roundedDiscount = Math.round(rawDiscount * 100) / 100;
+      setDiscount(roundedDiscount);
+    } else {
+      setDiscount(0);
+    }
+  
+    const taxableAmount = rawSubtotal - rawDiscount;
+    const rawTax = taxableAmount * (taxPercentage / 100);
+    const roundedTax = Math.round(rawTax * 100) / 100;
+    setTax(roundedTax);
+  
+    const rawTotal = taxableAmount + roundedTax + Number(tip);
+    const roundedTotal = Math.round(rawTotal * 100) / 100;
+    setTotal(roundedTotal);
+  
+    if (splitDivisor > 0) {
+      const rawSplitAmount = rawTotal / splitDivisor;
+      const roundedSplitAmount = Math.round(rawSplitAmount * 100) / 100;
+      setSplitAmount(roundedSplitAmount);
+    }
+  }, [taxPercentage, discountPercentage, tip, splitDivisor]);
+  
 
   //Persisting data between refresh
   useEffect(() => {
@@ -260,7 +249,7 @@ const Calculator = () => {
           {discount && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
           <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
           <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
-          {splitAmount > 0 && splitDivisor.length > 0 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
+          {splitAmount > 0 && splitDivisor > 0 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
         </div>
       </div>
     </ThemeProvider>
