@@ -31,3 +31,7 @@ export const calculateTotal = (subtotal, discount, tax, tip) => {
 export const calculateSplitAmount = (total, splitDivisor) => {
   return splitDivisor > 0 ? Math.round((total / splitDivisor) * 100) / 100 : 0;
 };
+
+export const calculatePercentageTip = (subtotal, tipPercentage) => {
+  return subtotal * (tipPercentage / 100);
+};

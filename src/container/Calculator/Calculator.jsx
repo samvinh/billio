@@ -3,6 +3,8 @@ import { AgGridReact } from "ag-grid-react";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -32,9 +34,16 @@ import {
   calculateTax,
   calculateTotal,
   calculateSplitAmount,
+  calculatePercentageTip,
 } from "../../utils/calculatorUtils";
 
 const Calculator = () => {
+  const [showHelpText, setShowHelpText] = useState(false);
+
+  const toggleHelpText = () => {
+    setShowHelpText((prev) => !prev);
+  };
+
   const [state, setState] = useState({
     billName: "",
     options: false,
@@ -357,15 +366,48 @@ const Calculator = () => {
           </div>
           <div className="calculator-cost-breakdown">
             <Typography>Subtotal: ${state.subtotal.toFixed(2)}</Typography>
-            <Typography>Discount: ${state.discount.toFixed(2)}</Typography>
+            {state.discount > 0 && (
+              <Typography variant="body1">
+                Discount: -${state.discount.toFixed(2)}
+              </Typography>
+            )}
+            {state.discount > 0 && (
+              <Typography>
+                Discounted Subtotal: $
+                {(state.subtotal - state.discount).toFixed(2)}
+              </Typography>
+            )}
             <Typography>Tax: ${state.tax.toFixed(2)}</Typography>
-            <Typography>Tip: ${state.tip.toFixed(2)}</Typography>
+            <div>
+              {state.tipType === "percentage" ? (
+                <Typography variant="body1">
+                  Tip: $
+                  {calculatePercentageTip(state.subtotal, state.tip).toFixed(2)}{" "}
+                  ({state.tip.toFixed(2)}%)
+                </Typography>
+              ) : (
+                <Typography variant="body1">
+                  Tip: ${state.tip.toFixed(2)}
+                </Typography>
+              )}
+            </div>
             <Typography>Total: ${state.total.toFixed(2)}</Typography>
             {state.splitDivisor > 1 && (
               <Typography>
                 Split {state.splitDivisor}-ways: ${state.splitAmount.toFixed(2)}
               </Typography>
             )}
+            <div>
+              <IconButton onClick={toggleHelpText}>
+                <LightbulbIcon />
+              </IconButton>
+              {showHelpText && (
+                <Typography variant="body2" style={{ marginTop: "8px" }}>
+                  The tip is applied to the subtotal before tax and excludes
+                  discounts.
+                </Typography>
+              )}
+            </div>
           </div>
         </div>
       </div>
