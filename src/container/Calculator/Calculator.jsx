@@ -12,6 +12,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { format } from "date-fns";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
@@ -44,11 +45,18 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Calculator = () => {
   const handleExportPDF = () => {
-    const { subtotal, discount, tax, tip, total, tipType } = state;
+    const { subtotal, discount, tax, tip, total, tipType, rowData, billName } =
+      state;
+
+    const now = new Date();
+    const formattedDate = format(now, "yyyy-MM-dd_HH-mm-ss");
+    const cleanBillName = billName.replace(/[<>:"/\\|?*]/g, "-");
+    const pdfFilename = `Bill_${cleanBillName}_${formattedDate}.pdf`;
 
     const docDefinition = {
       content: [
         { text: "Bill Summary", style: "header" },
+        { text: `${billName}`, style: "subheader" },
         {
           table: {
             body: [
@@ -70,6 +78,31 @@ const Calculator = () => {
               ["Total", total.toFixed(2)],
             ],
           },
+          margin: [0, 5, 0, 15],
+        },
+        { text: "Items", style: "subheader" },
+        {
+          table: {
+            headerRows: 1,
+            widths: ["*", "auto", "auto"], // Adjust widths as needed
+            body: [
+              ["Name", "Qty", "Price"],
+              ...rowData.map((item) => {
+                // Ensure data is valid and formatted correctly
+                const itemName = item.name
+                  ? item.name.toString()
+                  : "Unknown Item";
+                const quantity = !isNaN(item.qty)
+                  ? parseFloat(item.qty).toFixed(0)
+                  : "0";
+                const price = !isNaN(item.price)
+                  ? parseFloat(item.price).toFixed(2)
+                  : "0.00";
+                return [itemName, quantity, price];
+              }),
+            ],
+          },
+          margin: [0, 5, 0, 15],
         },
       ],
       styles: {
@@ -78,10 +111,15 @@ const Calculator = () => {
           bold: true,
           margin: [0, 0, 0, 10],
         },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 0, 0, 5],
+        },
       },
     };
 
-    pdfMake.createPdf(docDefinition).download("bill.pdf");
+    pdfMake.createPdf(docDefinition).download(pdfFilename);
   };
 
   const [showHelpText, setShowHelpText] = useState(false);
