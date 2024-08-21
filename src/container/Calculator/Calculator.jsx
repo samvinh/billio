@@ -16,9 +16,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from '../../themes/themes';
 import { defaultColDef, gridStyle, columnDefs } from '../../config/gridConfig';
 import {
-  handleInputChange,
-  handleNumericChange,
-  handleSwitchChange,
   handleAddItem,
   handleClearData,
   handleDeselectAll,
@@ -26,75 +23,47 @@ import {
 } from '../../handlers/handlers';
 
 const Calculator = () => {
-  const [billName, setBillName] = useState('')
-
-  const [options, setOptions] = useState(false)
-  const [splitDivisor, setSplitDivisor] = useState(1)
-  const [splitAmount, setSplitAmount] = useState(0)
-
-  const [discountPercentage, setDiscountPercentage] = useState(0)
-  const [discount, setDiscount] = useState(0)
-
-  const [taxPercentage, setTaxPercentage] = useState(0);
-  const [tax, setTax] = useState(0)
-
-  const [tip, setTip] = useState(0);
-
-  const [subtotal, setSubtotal] = useState(0)
-  const [total, setTotal] = useState(0)
-
-  const [rowData, setRowData] = useState([])
+  const [state, setState] = useState({
+    billName: '',
+    options: false,
+    splitDivisor: 1,
+    splitAmount: 0,
+    discountPercentage: 0,
+    discount: 0,
+    taxPercentage: 0,
+    tax: 0,
+    tip: 0,
+    subtotal: 0,
+    total: 0,
+    rowData: [],
+  });
 
   const gridRef = useRef()
 
   const calculateAll = useCallback(() => {
-    if (!gridRef.current) {
-      // No data available for calculation
-      return;
-    }
-    const rowData = [];
+    if (!gridRef.current) return;
   
-    if (gridRef.current?.api) {
-      gridRef.current.api.forEachNode(node => rowData.push(node.data));
-    }
-    setRowData(rowData);
+    const api = gridRef.current.api;
+    const rowData = getRowData(api);
+    const subtotal = calculateSubtotal(rowData);
+    const discount = calculateDiscount(subtotal, state.discountPercentage);
+    const tax = calculateTax(subtotal, discount, state.taxPercentage);
+    const total = calculateTotal(subtotal, discount, tax, state.tip);
+    const splitAmount = calculateSplitAmount(total, state.splitDivisor);
+  
+    setState(prevState => ({
+      ...prevState,
+      rowData,
+      subtotal,
+      discount,
+      tax,
+      total,
+      splitAmount
+    }));
+  
     window.localStorage.setItem('rowData', JSON.stringify(rowData));
+  }, [state.discountPercentage, state.taxPercentage, state.tip, state.splitDivisor]);
   
-    const rawSubtotal = rowData.reduce(
-      (sum, { qty, price }) => (qty && price ? sum + qty * price : sum),
-      0
-    );
-    const roundedSubtotal = Math.round(rawSubtotal * 100) / 100;
-    setSubtotal(roundedSubtotal);
-  
-    let rawDiscount = 0;
-    let roundedDiscount = 0;
-  
-    if (discountPercentage > 0) {
-      rawDiscount = rawSubtotal * (discountPercentage / 100);
-      roundedDiscount = Math.round(rawDiscount * 100) / 100;
-      setDiscount(roundedDiscount);
-    } else {
-      setDiscount(0);
-    }
-  
-    const taxableAmount = rawSubtotal - rawDiscount;
-    const rawTax = taxableAmount * (taxPercentage / 100);
-    const roundedTax = Math.round(rawTax * 100) / 100;
-    setTax(roundedTax);
-  
-    const rawTotal = taxableAmount + roundedTax + Number(tip);
-    const roundedTotal = Math.round(rawTotal * 100) / 100;
-    setTotal(roundedTotal);
-  
-    if (splitDivisor > 0) {
-      const rawSplitAmount = rawTotal / splitDivisor;
-      const roundedSplitAmount = Math.round(rawSplitAmount * 100) / 100;
-      setSplitAmount(roundedSplitAmount);
-    }
-  }, [taxPercentage, discountPercentage, tip, splitDivisor]);
-  
-
   // Persisting data between refresh
   useEffect(() => {
     const billName = window.localStorage.getItem('billName') != null ? window.localStorage.getItem('billName') : ''
@@ -104,56 +73,62 @@ const Calculator = () => {
     const tip = window.localStorage.getItem('tip') != null ? window.localStorage.getItem('tip') : 0
     const splitDivisor = window.localStorage.getItem('splitDivisor') != null ? window.localStorage.getItem('splitDivisor') : 1
 
-    setBillName(billName)
-    setRowData(rowData)
-    setDiscountPercentage(discountPercentage)
-    setTaxPercentage(taxPercentage)
-    setTip(tip)
-    setSplitDivisor(splitDivisor)
+    setState(prevState => ({
+      ...prevState,
+      billName,
+      rowData,
+      discountPercentage,
+      taxPercentage,
+      tip,
+      splitDivisor
+    }));
   }, []);
 
   // Updates local storage whenever the bill name changes or row data changes
   useEffect(() => {
-    window.localStorage.setItem('billName', billName)
-    window.localStorage.setItem('rowData', JSON.stringify(rowData))
-  }, [billName, rowData]);
+    window.localStorage.setItem('billName', state.billName);
+    window.localStorage.setItem('rowData', JSON.stringify(state.rowData));
+  }, [state.billName, state.rowData]);
+  
 
   // Updates local storage and recalculates the bill whenever option values change
   useEffect(() => {
-    window.localStorage.setItem('discountPercentage', discountPercentage);
-    window.localStorage.setItem('taxPercentage', taxPercentage);
-    window.localStorage.setItem('tip', tip);
-    window.localStorage.setItem('splitDivisor', splitDivisor);
-
-    // Ensure grid contains data, otherwise calculateAll() will run, perform calculations, 
-    // then reset local storage prematurely
-    if(rowData.length > 0){
-      calculateAll()
+    window.localStorage.setItem('discountPercentage', state.discountPercentage);
+    window.localStorage.setItem('taxPercentage', state.taxPercentage);
+    window.localStorage.setItem('tip', state.tip);
+    window.localStorage.setItem('splitDivisor', state.splitDivisor);
+  
+    if (state.rowData.length > 0) {
+      calculateAll();
     }
-  }, [rowData.length, taxPercentage, discountPercentage, tip, splitDivisor, calculateAll])
+  }, [state.rowData.length, state.taxPercentage, state.discountPercentage, state.tip, state.splitDivisor, calculateAll]);
 
-  const handleBillNameChange = handleInputChange(setBillName);
-  const handleOptionsChange = handleSwitchChange(setOptions);
-  const handleTaxPercentageChange = handleNumericChange(setTaxPercentage);
-  const handleDiscountPercentageChange = handleNumericChange(setDiscountPercentage);
-  const handleTipChange = handleNumericChange(setTip);
-  const handleSplitDivisorChange = handleNumericChange(setSplitDivisor, 1);
+  const handleBillNameChange = (e) => setState(prevState => ({ ...prevState, billName: e.target.value }));
+  const handleOptionsChange = (e) => setState(prevState => ({ ...prevState, options: e.target.checked }));
+  const handleTaxPercentageChange = (e) => setState(prevState => ({ ...prevState, taxPercentage: parseFloat(e.target.value) }));
+  const handleDiscountPercentageChange = (e) => setState(prevState => ({ ...prevState, discountPercentage: parseFloat(e.target.value) }));
+  const handleTipChange = (e) => setState(prevState => ({ ...prevState, tip: parseFloat(e.target.value) }));
+  const handleSplitDivisorChange = (e) => setState(prevState => ({ ...prevState, splitDivisor: parseInt(e.target.value, 10) }));  
 
   const addItem = handleAddItem(gridRef);
   const clearData = handleClearData(gridRef, calculateAll, (newState) => {
-    setBillName(newState.billName);
-    setDiscount(newState.discount);
-    setDiscountPercentage(newState.discountPercentage);
-    setTax(newState.tax);
-    setTaxPercentage(newState.taxPercentage);
-    setTip(newState.tip);
-    setSplitDivisor(newState.splitDivisor);
-    setSplitAmount(newState.splitAmount);
+    setState(prevState => ({
+      ...prevState,
+      billName: newState.billName,
+      discount: newState.discount,
+      discountPercentage: newState.discountPercentage,
+      tax: newState.tax,
+      taxPercentage: newState.taxPercentage,
+      tip: newState.tip,
+      splitDivisor: newState.splitDivisor,
+      splitAmount: newState.splitAmount
+    }));
   });
   const deselect = handleDeselectAll(gridRef);
   const onRemoveSelected = handleRemoveSelected(gridRef, calculateAll);
+  
 
-  let splitDivisorText = splitDivisor > 1 ? `Split ${splitDivisor}-ways` : `Split ${splitDivisor}-way`
+  const splitDivisorText = state.splitDivisor > 1 ? `Split ${state.splitDivisor}-ways` : `Split ${state.splitDivisor}-way`;
 
   return (
     <ThemeProvider theme={theme}>
@@ -161,7 +136,7 @@ const Calculator = () => {
         <div className='full-height'>
           <TextField
             id="billName"
-            value={billName}
+            value={state.billName}
             variant="standard"
             label="Bill Name"
             onChange={handleBillNameChange}
@@ -174,7 +149,7 @@ const Calculator = () => {
             <div style={gridStyle} className="ag-theme-alpine">
               <AgGridReact
                 ref={gridRef}
-                rowData={rowData}
+                rowData={state.rowData}
                 columnDefs={columnDefs}
                 singleClickEdit={true}
                 defaultColDef={defaultColDef}
@@ -190,14 +165,13 @@ const Calculator = () => {
         <div className='center-content'>
           <Button sx={{ ml: '2em', mr: '2em', mt: '1em'}} variant='standard' color='neutral' onClick={() => deselect()}>Unselect All</Button>
           <Button sx={{ ml: '2em', mr: '2em', mt: '1em'}} variant='contained' color='primary' startIcon={<AddCircleIcon />} onClick={() => addItem(undefined)}>Add Item</Button>
-          {/* <Button variant='contained' color='neutral' onClick={() => getRowData()}>Data</Button> */}
         </div>
         <div className='options-container'>
-          <FormControlLabel color='primary' control={<Switch value={options} onChange={handleOptionsChange}/>} label="Options" />
-          {options && <div>
+          <FormControlLabel color='primary' control={<Switch checked={state.options} onChange={handleOptionsChange}/>} label="Options" />
+          {state.options && <div>
             <TextField
               id="discount-percentage"
-              value={discountPercentage}
+              value={state.discountPercentage}
               type="number"
               variant="standard"
               label="Discount percent"
@@ -212,7 +186,7 @@ const Calculator = () => {
             />
             <TextField
               id="tax-percentage"
-              value={taxPercentage}
+              value={state.taxPercentage}
               type="number"
               variant="standard"
               label="Tax percent"
@@ -227,7 +201,7 @@ const Calculator = () => {
             />
             <TextField
               id="tip"
-              value={tip}
+              value={state.tip}
               type="number"
               variant="standard"
               label="Tip"
@@ -242,7 +216,7 @@ const Calculator = () => {
             />
             <TextField
               id="split-divisor"
-              value={splitDivisor}
+              value={state.splitDivisor}
               type="number"
               variant="standard"
               label={splitDivisorText}
@@ -254,16 +228,46 @@ const Calculator = () => {
           </div>}
         </div>
         <div className='cost-breakdown'>
-          <Typography variant='body1'>Subtotal: ${subtotal.toFixed(2)}</Typography>
-          {discount > 0 && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
-          <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
-          {tip > 0 && <Typography variant='body1'>Tip: ${Number(tip).toFixed(2)}</Typography>}
-          <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
-          {splitAmount > 0 && splitDivisor > 1 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
+          <Typography variant='body1'>Subtotal: ${state.subtotal.toFixed(2)}</Typography>
+          {state.discount > 0 && <Typography variant='body1'>Discount: -${state.discount.toFixed(2)}</Typography>}
+          <Typography variant='body1'>Tax: ${state.tax.toFixed(2)}</Typography>
+          {state.tip > 0 && <Typography variant='body1'>Tip: ${Number(state.tip).toFixed(2)}</Typography>}
+          <Typography variant='body1'><strong>Total: ${state.total.toFixed(2)}</strong></Typography>
+          {state.splitAmount > 0 && state.splitDivisor > 1 && <Typography variant='body1'>Split: ${state.splitAmount.toFixed(2)}</Typography>}
         </div>
       </div>
     </ThemeProvider>
   )
 }
+
+const getRowData = (api) => {
+  const rowData = [];
+  api.forEachNode(node => rowData.push(node.data));
+  return rowData;
+};
+
+const calculateSubtotal = (rowData) => {
+  return rowData.reduce(
+    (sum, { qty, price }) => (qty && price ? sum + qty * price : sum),
+    0
+  );
+};
+
+const calculateDiscount = (subtotal, discountPercentage) => {
+  return discountPercentage > 0 ? Math.round((subtotal * (discountPercentage / 100)) * 100) / 100 : 0;
+};
+
+const calculateTax = (subtotal, discount, taxPercentage) => {
+  const taxableAmount = subtotal - discount;
+  return Math.round((taxableAmount * (taxPercentage / 100)) * 100) / 100;
+};
+
+const calculateTotal = (subtotal, discount, tax, tip) => {
+  return Math.round((subtotal - discount + tax + Number(tip)) * 100) / 100;
+};
+
+const calculateSplitAmount = (total, splitDivisor) => {
+  return splitDivisor > 0 ? Math.round((total / splitDivisor) * 100) / 100 : 0;
+};
 
 export default Calculator

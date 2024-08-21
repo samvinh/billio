@@ -1,21 +1,5 @@
 // src/handlers/handlers.js
 
-// Handle input change for text fields
-export const handleInputChange = (setter) => (event) => {
-  setter(event.target.value);
-};
-
-// Handle changes to numeric fields with validation
-export const handleNumericChange = (setter, minValue = 0) => (event) => {
-  const value = Math.max(event.target.value, minValue);
-  setter(value);
-};
-
-// Handle toggle switch change
-export const handleSwitchChange = (setter) => (event) => {
-  setter(event.target.checked);
-};
-
 // Handle adding an item to the grid
 export const handleAddItem = (gridRef) => () => {
   gridRef.current.api.applyTransaction({
