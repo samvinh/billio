@@ -2,7 +2,7 @@
 
 export const getRowData = (api) => {
   const rowData = [];
-  api.forEachNode(node => rowData.push(node.data));
+  api.forEachNode((node) => rowData.push(node.data));
   return rowData;
 };
 
@@ -14,12 +14,14 @@ export const calculateSubtotal = (rowData) => {
 };
 
 export const calculateDiscount = (subtotal, discountPercentage) => {
-  return discountPercentage > 0 ? Math.round((subtotal * (discountPercentage / 100)) * 100) / 100 : 0;
+  return discountPercentage > 0
+    ? Math.round(subtotal * (discountPercentage / 100) * 100) / 100
+    : 0;
 };
 
 export const calculateTax = (subtotal, discount, taxPercentage) => {
   const taxableAmount = subtotal - discount;
-  return Math.round((taxableAmount * (taxPercentage / 100)) * 100) / 100;
+  return Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
 };
 
 export const calculateTotal = (subtotal, discount, tax, tip) => {

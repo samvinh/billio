@@ -20,7 +20,7 @@ export const handleClearData = (gridRef, calculateAll, setState) => () => {
   calculateAll();
   localStorage.clear();
   setState({
-    billName: '',
+    billName: "",
     discount: null,
     discountPercentage: 0,
     tax: 0,
