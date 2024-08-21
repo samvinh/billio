@@ -1,5 +1,3 @@
-// src/handlers/handlers.js
-
 // Handle adding an item to the grid
 export const handleAddItem = (gridRef) => () => {
   gridRef.current.api.applyTransaction({
@@ -40,5 +38,7 @@ export const handleDeselectAll = (gridRef) => () => {
 export const handleRemoveSelected = (gridRef, calculateAll) => () => {
   const selectedData = gridRef.current.api.getSelectedRows();
   gridRef.current.api.applyTransaction({ remove: selectedData });
+
+  // Recalculate totals
   calculateAll();
 };

@@ -282,7 +282,12 @@ const Calculator = () => {
     }));
   });
   const deselect = handleDeselectAll(gridRef);
+
   const onRemoveSelected = handleRemoveSelected(gridRef, calculateAll);
+
+  const onCellEditingStopped = () => {
+    calculateAll();
+  };
 
   const splitDivisorText =
     state.splitDivisor > 1
@@ -318,13 +323,12 @@ const Calculator = () => {
                 ref={gridRef}
                 rowData={state.rowData}
                 columnDefs={columnDefs}
-                singleClickEdit={true}
                 defaultColDef={defaultColDef}
                 domLayout={"autoHeight"}
-                rowSelection={"multiple"}
+                rowSelection="multiple"
                 animateRows={true}
                 stopEditingWhenCellsLoseFocus={true}
-                onCellEditingStopped={() => calculateAll()}
+                onCellEditingStopped={onCellEditingStopped}
               ></AgGridReact>
             </div>
           </div>
