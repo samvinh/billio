@@ -37,7 +37,53 @@ import {
   calculatePercentageTip,
 } from "../../utils/calculatorUtils";
 
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts"; // or from the specific path you use
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 const Calculator = () => {
+  const handleExportPDF = () => {
+    const { subtotal, discount, tax, tip, total, tipType } = state;
+
+    const docDefinition = {
+      content: [
+        { text: "Bill Summary", style: "header" },
+        {
+          table: {
+            body: [
+              ["Subtotal", subtotal.toFixed(2)],
+              [
+                "Discount",
+                discount > 0 ? `-${discount.toFixed(2)}` : discount.toFixed(2),
+              ],
+              ["Discounted Subtotal", (subtotal - discount).toFixed(2)],
+              ["Tax", tax.toFixed(2)],
+              [
+                "Tip",
+                tipType === "percentage"
+                  ? `${calculatePercentageTip(subtotal, tip).toFixed(
+                      2
+                    )} (${tip.toFixed(2)}%)`
+                  : tip.toFixed(2),
+              ],
+              ["Total", total.toFixed(2)],
+            ],
+          },
+        },
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10],
+        },
+      },
+    };
+
+    pdfMake.createPdf(docDefinition).download("bill.pdf");
+  };
+
   const [showHelpText, setShowHelpText] = useState(false);
 
   const toggleHelpText = () => {
@@ -410,6 +456,9 @@ const Calculator = () => {
             </div>
           </div>
         </div>
+        <Button variant="contained" color="primary" onClick={handleExportPDF}>
+          Export as PDF
+        </Button>
       </div>
     </ThemeProvider>
   );

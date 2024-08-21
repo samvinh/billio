@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "ag-grid-community": "^29.1.0",
     "ag-grid-react": "^29.1.0",
+    "pdfmake": "^0.2.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
