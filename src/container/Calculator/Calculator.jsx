@@ -206,7 +206,7 @@ const Calculator = () => {
               }}
               inputProps={{
                 min: 0, 
-                step: '.1'
+                step: '1'
               }}
               onChange={handleDiscountPercentageChange}
             />
@@ -221,7 +221,7 @@ const Calculator = () => {
               }}
               inputProps={{
                 min: 0, 
-                step: '.1'
+                step: '1'
               }}
               onChange={handleTaxPercentageChange}
             />
@@ -236,7 +236,7 @@ const Calculator = () => {
               }}
               inputProps={{
                 min: 0, 
-                step: '.01'
+                step: '1'
               }}
               onChange={handleTipChange}
             />
@@ -259,7 +259,7 @@ const Calculator = () => {
           <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
           {tip > 0 && <Typography variant='body1'>Tip: ${Number(tip).toFixed(2)}</Typography>}
           <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
-          {splitAmount > 0 && splitDivisor > 0 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
+          {splitAmount > 0 && splitDivisor > 1 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
         </div>
       </div>
     </ThemeProvider>
