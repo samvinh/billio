@@ -1,5 +1,5 @@
-import React, { useState, useRef, useMemo, useCallback, useEffect} from 'react'
-import { AgGridReact } from 'ag-grid-react' // the AG Grid React Component
+import React, { useState, useRef, useCallback, useEffect} from 'react'
+import { AgGridReact } from 'ag-grid-react'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -48,12 +48,15 @@ const Calculator = () => {
   const gridRef = useRef()
 
   const calculateAll = useCallback(() => {
+    if (!gridRef.current) {
+      // No data available for calculation
+      return;
+    }
     const rowData = [];
   
     if (gridRef.current?.api) {
       gridRef.current.api.forEachNode(node => rowData.push(node.data));
     }
-  
     setRowData(rowData);
     window.localStorage.setItem('rowData', JSON.stringify(rowData));
   
@@ -92,7 +95,7 @@ const Calculator = () => {
   }, [taxPercentage, discountPercentage, tip, splitDivisor]);
   
 
-  //Persisting data between refresh
+  // Persisting data between refresh
   useEffect(() => {
     const billName = window.localStorage.getItem('billName') != null ? window.localStorage.getItem('billName') : ''
     const rowData = window.localStorage.getItem('rowData') != null ? JSON.parse(window.localStorage.getItem('rowData')) : []
@@ -109,19 +112,25 @@ const Calculator = () => {
     setSplitDivisor(splitDivisor)
   }, []);
 
+  // Updates local storage whenever the bill name changes or row data changes
   useEffect(() => {
     window.localStorage.setItem('billName', billName)
     window.localStorage.setItem('rowData', JSON.stringify(rowData))
   }, [billName, rowData]);
 
+  // Updates local storage and recalculates the bill whenever option values change
   useEffect(() => {
     window.localStorage.setItem('discountPercentage', discountPercentage);
     window.localStorage.setItem('taxPercentage', taxPercentage);
     window.localStorage.setItem('tip', tip);
     window.localStorage.setItem('splitDivisor', splitDivisor);
 
-    calculateAll()
-  }, [taxPercentage, discountPercentage, tip, splitDivisor, calculateAll])
+    // Ensure grid contains data, otherwise calculateAll() will run, perform calculations, 
+    // then reset local storage prematurely
+    if(rowData.length > 0){
+      calculateAll()
+    }
+  }, [rowData.length, taxPercentage, discountPercentage, tip, splitDivisor, calculateAll])
 
   const handleBillNameChange = handleInputChange(setBillName);
   const handleOptionsChange = handleSwitchChange(setOptions);
@@ -246,8 +255,9 @@ const Calculator = () => {
         </div>
         <div className='cost-breakdown'>
           <Typography variant='body1'>Subtotal: ${subtotal.toFixed(2)}</Typography>
-          {discount && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
+          {discount > 0 && <Typography variant='body1'>Discount: -${discount.toFixed(2)}</Typography>}
           <Typography variant='body1'>Tax: ${tax.toFixed(2)}</Typography>
+          {tip > 0 && <Typography variant='body1'>Tip: ${Number(tip).toFixed(2)}</Typography>}
           <Typography variant='body1'><strong>Total: ${total.toFixed(2)}</strong></Typography>
           {splitAmount > 0 && splitDivisor > 0 && <Typography variant='body1'>Split: ${splitAmount.toFixed(2)}</Typography>}
         </div>
