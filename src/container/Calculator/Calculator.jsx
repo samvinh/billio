@@ -22,6 +22,8 @@ import {
   handleRemoveSelected,
 } from '../../handlers/handlers';
 
+import { getRowData, calculateSubtotal, calculateDiscount, calculateTax, calculateTotal, calculateSplitAmount } from '../../utils/calculatorUtils';
+
 const Calculator = () => {
   const [state, setState] = useState({
     billName: '',
@@ -239,35 +241,5 @@ const Calculator = () => {
     </ThemeProvider>
   )
 }
-
-const getRowData = (api) => {
-  const rowData = [];
-  api.forEachNode(node => rowData.push(node.data));
-  return rowData;
-};
-
-const calculateSubtotal = (rowData) => {
-  return rowData.reduce(
-    (sum, { qty, price }) => (qty && price ? sum + qty * price : sum),
-    0
-  );
-};
-
-const calculateDiscount = (subtotal, discountPercentage) => {
-  return discountPercentage > 0 ? Math.round((subtotal * (discountPercentage / 100)) * 100) / 100 : 0;
-};
-
-const calculateTax = (subtotal, discount, taxPercentage) => {
-  const taxableAmount = subtotal - discount;
-  return Math.round((taxableAmount * (taxPercentage / 100)) * 100) / 100;
-};
-
-const calculateTotal = (subtotal, discount, tax, tip) => {
-  return Math.round((subtotal - discount + tax + Number(tip)) * 100) / 100;
-};
-
-const calculateSplitAmount = (total, splitDivisor) => {
-  return splitDivisor > 0 ? Math.round((total / splitDivisor) * 100) / 100 : 0;
-};
 
 export default Calculator
