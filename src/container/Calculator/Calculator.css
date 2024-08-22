@@ -124,3 +124,42 @@
   flex-direction: column;
   align-items: flex-end;
 }
+
+.export-button-container {
+  position: fixed;
+}
+
+@media screen and (min-width: 600px) {
+  .export-button-container {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .export-button-container {
+    top: 40px;
+    right: 40px;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .export-button-container {
+    top: 60px;
+    right: 60px;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .export-button-container {
+    top: 80px;
+    right: 80px;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .export-button-container {
+    bottom: 20px;
+    left: 20px;
+  }
+}

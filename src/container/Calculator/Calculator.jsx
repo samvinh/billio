@@ -46,76 +46,148 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const Calculator = () => {
   const handleExportPDF = () => {
-    const { subtotal, discount, tax, tip, total, tipType, rowData, billName } =
-      state;
+    const {
+      subtotal,
+      discount,
+      tax,
+      tip,
+      total,
+      tipType,
+      rowData,
+      billName,
+      contributors,
+    } = state;
 
     const now = new Date();
     const formattedDate = format(now, "yyyy-MM-dd_HH-mm-ss");
     const cleanBillName = billName.replace(/[<>:"/\\|?*]/g, "-");
     const pdfFilename = `Bill_${cleanBillName}_${formattedDate}.pdf`;
+    const exportDate = format(now, "yyyy-MM-dd HH:mm:ss");
 
     const docDefinition = {
       content: [
-        { text: "Bill Summary", style: "header" },
-        { text: `${billName}`, style: "subheader" },
+        { text: "BILL SUMMARY", style: "header" },
+        { text: exportDate, alignment: "right", margin: [0, 0, 0, 10] },
+
         {
-          table: {
-            body: [
-              ["Subtotal", subtotal.toFixed(2)],
-              [
-                "Discount",
-                discount > 0 ? `-${discount.toFixed(2)}` : discount.toFixed(2),
+          columns: [
+            {
+              text: [
+                { text: "From:\n", style: "subheader" },
+                `${cleanBillName}\n`,
+                "\n",
+                "\n",
+                "\n",
               ],
-              ["Discounted Subtotal", (subtotal - discount).toFixed(2)],
-              ["Tax", tax.toFixed(2)],
-              [
-                "Tip",
-                tipType === "percentage"
-                  ? `${calculatePercentageTip(subtotal, tip).toFixed(
-                      2
-                    )} (${tip.toFixed(2)}%)`
-                  : tip.toFixed(2),
+            },
+            {
+              text: [
+                { text: "To:\n", style: "subheader" },
+                `${contributors}`,
+                "\n",
+                "\n",
+                "\n",
               ],
-              ["Total", total.toFixed(2)],
-            ],
-          },
-          margin: [0, 5, 0, 15],
+              alignment: "right",
+            },
+          ],
+          margin: [0, 0, 0, 20],
         },
-        { text: "Items", style: "subheader" },
+        {
+          canvas: [
+            { type: "line", x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 },
+          ],
+        },
         {
           table: {
             headerRows: 1,
-            widths: ["*", "auto", "auto"], // Adjust widths as needed
+            widths: ["*", "auto", "auto", "auto"],
             body: [
-              ["Name", "Qty", "Price"],
+              [
+                { text: "Item", style: "tableHeader" },
+                { text: "Unit Price", style: "tableHeader" },
+                { text: "Quantity", style: "tableHeader" },
+                { text: "Item Total", style: "tableHeader" },
+              ],
               ...rowData.map((item) => {
-                // Ensure data is valid and formatted correctly
                 const itemName = item.name
                   ? item.name.toString()
                   : "Unknown Item";
+                const unitPrice = !isNaN(item.price)
+                  ? `$${parseFloat(item.price).toFixed(2)}`
+                  : "$0.00";
                 const quantity = !isNaN(item.qty)
                   ? parseFloat(item.qty).toFixed(0)
                   : "0";
-                const price = !isNaN(item.price)
-                  ? parseFloat(item.price).toFixed(2)
-                  : "0.00";
-                return [itemName, quantity, price];
+                const itemTotal = !isNaN(item.price * item.qty)
+                  ? `$${(item.price * item.qty).toFixed(2)}`
+                  : "$0.00";
+                return [itemName, unitPrice, quantity, itemTotal];
               }),
             ],
           },
-          margin: [0, 5, 0, 15],
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 20],
+        },
+        {
+          canvas: [
+            { type: "line", x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1 },
+          ],
+        },
+        {
+          columns: [
+            { width: "*", text: "" },
+            {
+              width: "auto",
+              table: {
+                body: [
+                  ["Subtotal", `$${subtotal.toFixed(2)}`],
+                  [
+                    "Discount",
+                    discount > 0
+                      ? `-$${discount.toFixed(2)}`
+                      : `$${discount.toFixed(2)}`,
+                  ],
+                  [
+                    "Discounted Subtotal",
+                    `$${(subtotal - discount).toFixed(2)}`,
+                  ],
+                  ["Tax", `$${tax.toFixed(2)}`],
+                  [
+                    "Tip",
+                    tipType === "percentage"
+                      ? `$${calculatePercentageTip(subtotal, tip).toFixed(
+                          2
+                        )} (${tip.toFixed(2)}%)`
+                      : `$${tip.toFixed(2)}`,
+                  ],
+                  [
+                    { text: "Total", bold: true },
+                    { text: `$${total.toFixed(2)}`, bold: true },
+                  ],
+                ],
+              },
+              layout: "noBorders",
+            },
+          ],
+          margin: [0, 10, 0, 0],
         },
       ],
       styles: {
         header: {
-          fontSize: 18,
+          fontSize: 20,
           bold: true,
           margin: [0, 0, 0, 10],
         },
         subheader: {
-          fontSize: 14,
+          fontSize: 12,
           bold: true,
-          margin: [0, 0, 0, 5],
+          margin: [0, 5, 0, 5],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 11,
+          color: "black",
         },
       },
     };
@@ -131,6 +203,7 @@ const Calculator = () => {
 
   const [state, setState] = useState({
     billName: "",
+    contributors: "",
     options: false,
     splitDivisor: 1,
     splitAmount: 0,
@@ -187,6 +260,7 @@ const Calculator = () => {
 
   useEffect(() => {
     const billName = window.localStorage.getItem("billName") || "";
+    const contributors = window.localStorage.getItem("contributors") || "";
     const rowData = JSON.parse(window.localStorage.getItem("rowData") || "[]");
     const discountPercentage = parseFloat(
       window.localStorage.getItem("discountPercentage") || "0"
@@ -204,6 +278,7 @@ const Calculator = () => {
     setState((prevState) => ({
       ...prevState,
       billName,
+      contributors,
       rowData,
       discountPercentage,
       taxPercentage,
@@ -215,8 +290,9 @@ const Calculator = () => {
 
   useEffect(() => {
     window.localStorage.setItem("billName", state.billName);
+    window.localStorage.setItem("contributors", state.contributors);
     window.localStorage.setItem("rowData", JSON.stringify(state.rowData));
-  }, [state.billName, state.rowData]);
+  }, [state.billName, state.contributors, state.rowData]);
 
   useEffect(() => {
     window.localStorage.setItem("tipType", state.tipType);
@@ -240,6 +316,9 @@ const Calculator = () => {
 
   const handleBillNameChange = (e) =>
     setState((prevState) => ({ ...prevState, billName: e.target.value }));
+
+  const handleContributorsChange = (e) =>
+    setState((prevState) => ({ ...prevState, contributors: e.target.value }));
 
   const handleToggleOptions = () =>
     setState((prevState) => ({ ...prevState, options: !prevState.options }));
@@ -273,6 +352,7 @@ const Calculator = () => {
     setState((prevState) => ({
       ...prevState,
       billName: newState.billName,
+      contributors: newState.contributors,
       discount: newState.discount,
       discountPercentage: newState.discountPercentage,
       tax: newState.tax,
@@ -307,7 +387,37 @@ const Calculator = () => {
             variant="standard"
             label="Bill Name"
             onChange={handleBillNameChange}
+            fullWidth
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              "& .MuiInputLabel-root": {
+                fontSize: "1rem", // Larger label text
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "1rem", // Larger input text
+              },
+            }}
           />
+          <TextField
+            id="contributors"
+            value={state.contributors}
+            variant="outlined"
+            label="Contributors"
+            onChange={handleContributorsChange}
+            fullWidth
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              "& .MuiInputLabel-root": {
+                fontSize: "1rem",
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "1rem",
+              },
+            }}
+          />
+
           <div className="button-group">
             <Button variant="outlined" color="primary" onClick={clearData}>
               Clear Data
@@ -502,9 +612,11 @@ const Calculator = () => {
             </div>
           </div>
         </div>
-        <Button variant="contained" color="primary" onClick={handleExportPDF}>
-          Export as PDF
-        </Button>
+        <div className="export-button-container">
+          <Button variant="contained" color="primary" onClick={handleExportPDF}>
+            Export as PDF
+          </Button>
+        </div>
       </div>
     </ThemeProvider>
   );
