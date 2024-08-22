@@ -13,6 +13,7 @@ import Switch from "@mui/material/Switch";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { format } from "date-fns";
+import { isMobile } from "react-device-detect";
 
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
@@ -289,6 +290,8 @@ const Calculator = () => {
     calculateAll();
   };
 
+  const singleClickEdit = isMobile;
+
   const splitDivisorText =
     state.splitDivisor > 1
       ? `Split ${state.splitDivisor}-ways`
@@ -329,6 +332,7 @@ const Calculator = () => {
                 animateRows={true}
                 stopEditingWhenCellsLoseFocus={true}
                 onCellEditingStopped={onCellEditingStopped}
+                singleClickEdit={singleClickEdit}
               ></AgGridReact>
             </div>
           </div>
