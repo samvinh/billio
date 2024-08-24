@@ -30,9 +30,8 @@
 }
 
 .calculator-container {
-  margin-left: 10px;
-  margin-right: 10px;
   padding-bottom: 2em;
+  position: relative;
 }
 
 .calculator-cost-breakdown {
@@ -45,36 +44,14 @@
   padding-bottom: 4em;
 }
 
-@media screen and (min-width: 600px) {
-  .calculator-container {
-    margin: 10px 50px;
-  }
-}
-
-@media screen and (min-width: 800px) {
-  .calculator-container {
-    margin: 10px 75px;
-  }
-}
-
-@media screen and (min-width: 1000px) {
-  .calculator-container {
-    margin: 10px 100px;
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  .calculator-container {
-    margin-left: auto;
-    margin-right: auto;
-    width: 800px;
-  }
-}
-
 .full-height {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.bill-header {
+  margin-top: 20px;
 }
 
 .button-group {
@@ -121,6 +98,7 @@
 
 .options-container {
   width: 48%;
+  padding-bottom: 20px;
   margin-bottom: 20px;
 }
 
@@ -132,40 +110,19 @@
 }
 
 .export-button-container {
-  position: fixed;
+  position: absolute;
 }
 
 @media screen and (min-width: 600px) {
   .export-button-container {
-    top: 20px;
-    right: 20px;
-  }
-}
-
-@media screen and (min-width: 800px) {
-  .export-button-container {
-    top: 40px;
-    right: 40px;
-  }
-}
-
-@media screen and (min-width: 1000px) {
-  .export-button-container {
-    top: 60px;
-    right: 60px;
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  .export-button-container {
-    top: 80px;
-    right: 80px;
+    top: 0px;
+    right: 10px;
   }
 }
 
 @media screen and (max-width: 599px) {
   .export-button-container {
     bottom: 20px;
-    left: 20px;
+    left: 10px;
   }
 }

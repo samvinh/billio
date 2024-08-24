@@ -381,43 +381,44 @@ const Calculator = () => {
     <ThemeProvider theme={theme}>
       <div className="calculator-container">
         <div className="full-height">
-          <TextField
-            id="billName"
-            value={state.billName}
-            variant="standard"
-            label="Bill Name"
-            onChange={handleBillNameChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{ shrink: true }}
-            sx={{
-              "& .MuiInputLabel-root": {
-                fontSize: "1rem", // Larger label text
-              },
-              "& .MuiInputBase-input": {
-                fontSize: "1rem", // Larger input text
-              },
-            }}
-          />
-          <TextField
-            id="contributors"
-            value={state.contributors}
-            variant="outlined"
-            label="Contributors"
-            onChange={handleContributorsChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{ shrink: true }}
-            sx={{
-              "& .MuiInputLabel-root": {
-                fontSize: "1rem",
-              },
-              "& .MuiInputBase-input": {
-                fontSize: "1rem",
-              },
-            }}
-          />
-
+          <div className="bill-header">
+            <TextField
+              id="billName"
+              value={state.billName}
+              variant="standard"
+              label="Bill Name"
+              onChange={handleBillNameChange}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontSize: "1rem",
+                },
+                "& .MuiInputBase-input": {
+                  fontSize: "1rem",
+                },
+              }}
+            />
+            <TextField
+              id="contributors"
+              value={state.contributors}
+              variant="outlined"
+              label="Contributors"
+              onChange={handleContributorsChange}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontSize: "1rem",
+                },
+                "& .MuiInputBase-input": {
+                  fontSize: "1rem",
+                },
+              }}
+            />
+          </div>
           <div className="button-group">
             <Button variant="outlined" color="primary" onClick={clearData}>
               Clear Data

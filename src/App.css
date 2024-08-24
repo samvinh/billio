@@ -39,3 +39,49 @@ h5,
 h6 {
   overflow-wrap: break-word;
 }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-container,
+.calculator-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.header-container {
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+  .header-container,
+  .calculator-container {
+    margin: 0 80px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-container,
+  .calculator-container {
+    margin: 0 120px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .header-container,
+  .calculator-container {
+    margin: 0 160px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
