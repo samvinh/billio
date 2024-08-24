@@ -17,9 +17,15 @@
   min-height: 0px;
 }
 
+.ag-theme-alpine .ag-header-cell-label .ag-header-cell-text {
+  height: auto;
+  overflow-wrap: normal;
+  white-space: normal;
+}
+
 .ag-theme-alpine {
-  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-  font-size: 14px;
+  --ag-font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  --ag-font-size: 1rem;
   --ag-borders: none;
 }
 
