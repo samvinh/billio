@@ -8,6 +8,12 @@ export const handleAddItem = (gridRef) => () => {
 
 // Handle clearing all data
 export const handleClearData = (gridRef, calculateAll, setState) => () => {
+  const userConfirmed = window.confirm(
+    "Are you sure you want to clear all data? This action cannot be undone."
+  );
+
+  if (!userConfirmed) return;
+
   const rowData = [];
   gridRef.current.api.forEachNode((node) => {
     rowData.push(node.data);
