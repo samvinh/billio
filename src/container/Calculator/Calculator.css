@@ -27,6 +27,8 @@
   --ag-font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   --ag-font-size: 1rem;
   --ag-borders: none;
+  --ag-header-column-resize-handle-height: 75%;
+  --ag-header-column-resize-handle-width: 6px;
 }
 
 .calculator-container {
@@ -44,17 +46,11 @@
   padding-bottom: 4em;
 }
 
-.full-height {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .bill-header {
   margin-top: 20px;
 }
 
-.button-group {
+.top-button-group {
   display: flex;
   margin-bottom: 20px;
   margin-top: 20px;
@@ -65,7 +61,7 @@
   flex-grow: 1;
 }
 
-.center-content {
+.bottom-button-group {
   display: flex;
   justify-content: center;
   margin: 10px;

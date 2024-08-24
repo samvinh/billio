@@ -3,9 +3,14 @@ import { AgGridReact } from "ag-grid-react";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import TuneIcon from "@mui/icons-material/Tune";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -380,75 +385,79 @@ const Calculator = () => {
   return (
     <ThemeProvider theme={theme}>
       <div className="calculator-container">
-        <div className="full-height">
-          <div className="bill-header">
-            <TextField
-              id="billName"
-              value={state.billName}
-              variant="standard"
-              label="Bill Name"
-              onChange={handleBillNameChange}
-              fullWidth
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  fontSize: "1rem",
-                },
-                "& .MuiInputBase-input": {
-                  fontSize: "1rem",
-                },
-              }}
-            />
-            <TextField
-              id="contributors"
-              value={state.contributors}
-              variant="outlined"
-              label="Contributors"
-              onChange={handleContributorsChange}
-              fullWidth
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiInputLabel-root": {
-                  fontSize: "1rem",
-                },
-                "& .MuiInputBase-input": {
-                  fontSize: "1rem",
-                },
-              }}
-            />
-          </div>
-          <div className="button-group">
-            <Button variant="outlined" color="primary" onClick={clearData}>
-              Clear Data
-            </Button>
-            <Button
-              variant="outlined"
-              color="danger"
-              onClick={onRemoveSelected}
-            >
-              Remove Selected
-            </Button>
-          </div>
-          <div className="flex-grow">
-            <div style={gridStyle} className="ag-theme-alpine">
-              <AgGridReact
-                ref={gridRef}
-                rowData={state.rowData}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                domLayout={"autoHeight"}
-                rowSelection="multiple"
-                animateRows={true}
-                stopEditingWhenCellsLoseFocus={true}
-                onCellEditingStopped={onCellEditingStopped}
-                singleClickEdit={singleClickEdit}
-              ></AgGridReact>
-            </div>
+        <div className="bill-header">
+          <TextField
+            id="billName"
+            value={state.billName}
+            variant="standard"
+            label="Bill Name"
+            onChange={handleBillNameChange}
+            fullWidth
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              "& .MuiInputLabel-root": {
+                fontSize: "1rem",
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "1rem",
+              },
+            }}
+          />
+          <TextField
+            id="contributors"
+            value={state.contributors}
+            variant="outlined"
+            label="Contributors"
+            onChange={handleContributorsChange}
+            fullWidth
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              "& .MuiInputLabel-root": {
+                fontSize: "1rem",
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "1rem",
+              },
+            }}
+          />
+        </div>
+        <div className="top-button-group">
+          <Button
+            variant="outlined"
+            color="danger"
+            startIcon={<ClearIcon />}
+            onClick={clearData}
+          >
+            Clear All
+          </Button>
+          <Button
+            variant="outlined"
+            color="danger"
+            startIcon={<DeleteIcon />}
+            onClick={onRemoveSelected}
+          >
+            Selected
+          </Button>
+        </div>
+        <div className="flex-grow">
+          <div style={gridStyle} className="ag-theme-alpine">
+            <AgGridReact
+              ref={gridRef}
+              rowData={state.rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              domLayout={"autoHeight"}
+              rowSelection="multiple"
+              animateRows={true}
+              stopEditingWhenCellsLoseFocus={true}
+              onCellEditingStopped={onCellEditingStopped}
+              singleClickEdit={singleClickEdit}
+            ></AgGridReact>
           </div>
         </div>
-        <div className="center-content">
+        <div className="bottom-button-group">
           <Button
             sx={{ ml: "2em", mr: "2em", mt: "1em" }}
             variant="standard"
@@ -461,16 +470,17 @@ const Calculator = () => {
             sx={{ ml: "2em", mr: "2em", mt: "1em" }}
             variant="contained"
             color="primary"
-            startIcon={<AddCircleIcon />}
+            startIcon={<AddIcon />}
             onClick={() => addItem(undefined)}
           >
-            Add Item
+            Row
           </Button>
         </div>
         <div className="options-results-container">
           <div className="options-container">
             <Button
               onClick={handleToggleOptions}
+              startIcon={<TuneIcon />}
               endIcon={state.options ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             >
               Options
@@ -601,7 +611,7 @@ const Calculator = () => {
               </Typography>
             )}
             <div>
-              <IconButton onClick={toggleHelpText}>
+              <IconButton color="primary" onClick={toggleHelpText}>
                 <LightbulbIcon />
               </IconButton>
               {showHelpText && (
@@ -614,8 +624,13 @@ const Calculator = () => {
           </div>
         </div>
         <div className="export-button-container">
-          <Button variant="contained" color="primary" onClick={handleExportPDF}>
-            Export as PDF
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<FileDownloadIcon />}
+            onClick={handleExportPDF}
+          >
+            Export PDF
           </Button>
         </div>
       </div>
